@@ -26,7 +26,7 @@
           title: 'Programavimas sausai',
           ISBN: 'IT-12347',
           publishing_year: 2021,
-          pages: 200,
+          pages: 240,
           quantity: 20,
           price: 18,
         },
@@ -42,7 +42,7 @@
           title: 'IT pagrindai',
           ISBN: 'IT-12349',
           publishing_year: 2023,
-          pages: 200,
+          pages: 240,
           quantity: 15,
           price: 24,
         },
@@ -275,40 +275,234 @@
     },
   ];
 
-  function formatMoney(num) {
-    return num.toFixed(2) + ' EUR';
-  }
+  /*
+  Extra tasks:
+  Write function for filter books by category, title, pages
+  Write function for min and max price
+  Wirte function for sort books by author,price, title
+*/
 
-  const yearThreshold = 2024;
-
-  // object can be const with mutable properties
-  const categoryTotals = {};
-
-  for (const catObj of inventory) {
-    let categoryTotal = 0;
-    console.log(`${catObj.category} --------`);
-    for (const bookObj of catObj.books) {
-      // Kaip čia reikėjo? Ar iteruoti for(prop in bookObj) ir tikrinti if(prop === 'publishing_year') ir pan.?
-      let inv = bookObj.price * bookObj.quantity;
-      console.log(bookObj.title);
-      console.log(
-        bookObj.publishing_year +
-          (bookObj.publishing_year >= yearThreshold ? ' New book' : '')
-      );
-      console.log(formatMoney(bookObj.price));
-      console.log('Quantity: ' + bookObj.quantity);
-      console.log('Total: ' + formatMoney(inv));
-      categoryTotal += inv;
+  /**
+   * Works similarly to typeof operator, analyses first elements of data to assume which form of book list it is in
+   * @param {*} arr either a plain flat array of books, or an array with category groups with books in each of them
+   * @return {string|undefined} 'books', 'groups' or undefined
+   */
+  function guesstimateDataFormat(arr) {
+    if (Array.isArray(arr)) {
+      if (
+        Object.keys(arr[0]).includes('books') &&
+        Array.isArray(arr[0]['books'])
+      )
+        return 'groups';
+      if (Object.keys(arr[0]).includes('ISBN')) return 'books';
+      return undefined;
     }
-    categoryTotals[catObj.category] = categoryTotal;
+    return undefined;
   }
 
-  let invTotal = 0;
+  /**
+   * Converts books grouped by category into array of books
+   * @param {*} arr array of groups each having category and array of books
+   * @return {*} flattened array of books without category
+   */
+  function getAllBooks(arr) {
+    return [].concat(...arr.map((cat) => cat.books));
+  }
+
+  /**
+   * Filters a simple array of books by a specified property using strict equality
+   * @param {*} books an array of "book" objects
+   * @param {string} prop property name to filter by
+   * @param {*} val exact value for filtering (must be strictly equal)
+   * @return {*} an array of "book" objects, same format as input
+   */
+  function filterBooksArray(books, prop, val) {
+    return books.filter((bookObj) => bookObj[prop] === val);
+  }
+
+  /**
+   *
+   * Filters books within an array of category groups
+   * @param {*} arr array of category groups, each having an array of books
+   * @param {string} prop property name to filter by
+   * @param {*} val exact value for filtering (must be strictly equal in most cases)
+   * @return {*} same format as input with filtered books
+   */
+  function filterCategorisedBooks(arr, prop, val) {
+    switch (prop.toLowerCase()) {
+      case 'category':
+        return arr.filter(
+          (cat) => cat.category.toLowerCase() === val.toLowerCase()
+        );
+        break;
+      default: {
+        return arr
+          .map((cat) => ({
+            category: cat.category,
+            books: filterBooksArray(cat.books, prop, val),
+          }))
+          .filter((cat) => cat.books.length > 0);
+      }
+    }
+  }
+
+  /**
+   * Takes a plain list of prices from book list
+   * @param {*} arr either a plain flat array of books, or an array with category groups with books in each of them
+   * @return {number[]} all prices without context
+   */
+  function getAllPrices(arr) {
+    switch (guesstimateDataFormat(arr)) {
+      case 'groups':
+        return getAllBooks(arr).map((bookObj) => bookObj.price);
+        break;
+      case 'books':
+        return arr.map((bookObj) => bookObj.price);
+        break;
+    }
+  }
+
+  function getMinPrice(arr) {
+    return Math.min(...getAllPrices(arr));
+  }
+
+  function getMaxPrice(arr) {
+    return Math.max(...getAllPrices(arr));
+  }
+
+  /**
+   * sorts an array of books by a primitive property
+   * @param {*} books an array of "book" objects
+   * @param {string} prop a property name (works with primitive values)
+   * @param {number} dir must be 1 or -1
+   * @return {*} a new array (toSorted())
+   */
+  function getSortedBookArray(books, prop, dir) {
+    return books.toSorted((book1, book2) => {
+      return book1[prop] > book2[prop]
+        ? dir
+        : book1[prop] < book2[prop]
+        ? dir * -1
+        : 0;
+    });
+  }
+
+  /**
+   * sorts books within their categories
+   * @param {*} arr array of category groups, each having an array of books
+   * @param {string} prop a property name (works with primitive values)
+   * @param {string|number} direction can be 'asc', 'desc', 1, -1; defaults to ascending sort
+   * @return {*} a new array, maintaining structural data format (toSorted())
+   */
+  function getSortedBooksInCategories(arr, prop, direction) {
+    let dir = 1;
+    switch (direction) {
+      case 'desc':
+      case 'Desc':
+      case -1:
+        dir = -1;
+        break;
+      case 'asc':
+      case 'Asc':
+      case 1:
+        dir = 1;
+        break;
+    }
+    return arr.map((cat) => ({
+      category: cat.category,
+      books: getSortedBookArray(cat.books, prop, dir),
+    }));
+  }
+
+  function formatMoney(num) {
+    return num.toFixed(2) + ' \u{20AC}';
+  }
+
+  function printBookInfo(bookObj, yearThreshold) {
+    let inv = bookObj.price * bookObj.quantity;
+    console.log(
+      `${bookObj.title} (${bookObj.publishing_year}${
+        bookObj.publishing_year >= yearThreshold ? ' New book' : ''
+      }) ${bookObj.pages} pages`
+    );
+    console.log(
+      `${formatMoney(bookObj.price).padStart(8)}  x${bookObj.quantity
+        .toString()
+        .padStart(3)} = ${formatMoney(inv).padStart(9)}`
+    );
+  }
+
+  const YEAR_THRESHOLD = 2024;
+
+  function printInventoryReport(inv, includeSummary) {
+    // object can be const with mutable properties
+    const categoryTotals = {};
+
+    for (const catObj of inv) {
+      let categoryTotal = 0;
+      console.log(`----{ ${catObj.category} }--------`);
+      for (const bookObj of catObj.books) {
+        printBookInfo(bookObj, YEAR_THRESHOLD);
+        categoryTotal += bookObj.price * bookObj.quantity;
+      }
+      categoryTotals[catObj.category] = categoryTotal;
+    }
+    console.log('------------');
+    if (includeSummary) {
+      let invTotal = 0;
+      for (const category in categoryTotals) {
+        invTotal += categoryTotals[category];
+        console.log(`${category}: ${formatMoney(categoryTotals[category])}`);
+      }
+      console.log(`Total inventory: ${formatMoney(invTotal)}`);
+    }
+  }
+
+  printInventoryReport(inventory);
+
   console.log('--------');
-  for (const category in categoryTotals) {
-    invTotal += categoryTotals[category];
-    console.log(`${category}: ${formatMoney(categoryTotals[category])}`);
-  }
 
-  console.log(`Total inventory: ${formatMoney(invTotal)}`);
+  console.log(guesstimateDataFormat(inventory));
+  console.log(guesstimateDataFormat(getAllBooks(inventory)));
+
+  console.log('>>>>{ filter by category }----');
+  printInventoryReport(
+    filterCategorisedBooks(inventory, 'category', 'informacinės technologijos')
+  );
+  console.log('>>>>{ filter by title }----');
+  printInventoryReport(
+    filterCategorisedBooks(inventory, 'title', 'Programavimas linksmai')
+  );
+  console.log('>>>>{ filter by pages }----');
+  printInventoryReport(filterCategorisedBooks(inventory, 'pages', 240));
+
+  console.log('>>>> cheapest book: ' + formatMoney(getMinPrice(inventory)));
+  console.log(
+    '>>>> most expensive book: ' + formatMoney(getMaxPrice(inventory))
+  );
+  console.log(
+    '>>>> most expensive book in category: ' +
+      formatMoney(
+        getMaxPrice(
+          filterCategorisedBooks(
+            inventory,
+            'category',
+            'informacinės technologijos'
+          )
+        )
+      )
+  );
+
+  console.log('>>>>{ sort by price asc }----');
+  printInventoryReport(
+    getSortedBooksInCategories(inventory, 'price', 'asc'),
+    false
+  );
+  console.log('>>>>{ sort by price desc }----');
+  printInventoryReport(
+    getSortedBooksInCategories(inventory, 'price', 'desc'),
+    false
+  );
+  console.log('>>>>{ sort by title }----');
+  printInventoryReport(getSortedBooksInCategories(inventory, 'title'), false);
 })();
