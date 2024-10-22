@@ -462,9 +462,6 @@
 
   console.log('--------');
 
-  console.log(guesstimateDataFormat(inventory));
-  console.log(guesstimateDataFormat(getAllBooks(inventory)));
-
   console.log('>>>>{ filter by category }----');
   printInventoryReport(
     filterCategorisedBooks(inventory, 'category', 'informacinės technologijos')
