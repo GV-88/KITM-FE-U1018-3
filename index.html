@@ -4,9 +4,116 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Task: Inventory Management for Books</title>
-    <script src="js/app.js"></script>
+    <!-- For classic scripts, if the defer property is set to true, the external script will be executed after the document has been parsed, but before firing DOMContentLoaded event. -->
+    <script src="js/utilities.js"></script>
+    <script src="js/dataOperations.js"></script>
+    <script src="js/domComponents.js"></script>
+    <script src="data/inventory.js"></script>
+    <script src="js/app.js" defer></script>
+    <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
-    <p>[output in console]</p>
+    <header><h1>Knygų inventorius</h1></header>
+    <main>
+      <div class="control-panel">
+        <form class="filter">
+          <div class="filter__field-block">
+            <label for="input-filter-category" class="filter__label"
+              >Kategorija</label
+            >
+            <select
+              id="input-filter-category"
+              name="category"
+              class="filter__input filter__input--select"
+            ></select>
+          </div>
+          <div class="filter__field-block">
+            <label for="input-filter-title" class="filter__label"
+              >Pavadinimas</label
+            >
+            <input
+              id="input-filter-title"
+              name="title"
+              class="filter__input filter__input--text"
+              type="text"
+              placeholder="..."
+            />
+          </div>
+          <div class="filter__field-block">
+            <label class="filter__label">Puslapiai (nuo/iki)</label>
+            <div class="filter__input-group">
+              <input
+                id="input-filter-pages-min"
+                name="pagesMin"
+                class="filter__input filter__input--number"
+                type="number"
+                min="0"
+                max="3000"
+                maxlength="4"
+                step="10"
+                value=""
+              />
+              <input
+                id="input-filter-pages-max"
+                name="pagesMax"
+                class="filter__input filter__input--number"
+                type="number"
+                min="0"
+                max="3000"
+                maxlength="4"
+                step="10"
+                value=""
+              />
+            </div>
+          </div>
+          <div class="filter__field-block">
+            <label for="input-filter-sort" class="filter__label"
+              >Rūšiavimas</label
+            >
+            <select
+              id="input-filter-sort"
+              name="sort"
+              class="filter__input filter__input--select"
+            >
+              <option value="">-</option>
+              <option value="title asc">Pavadinimas A-Z</option>
+              <option value="title desc">Pavadinimas Z-A</option>
+              <option value="price asc">Kaina min-max</option>
+              <option value="price desc">Kaina max-min</option>
+            </select>
+          </div>
+          <button class="filter__button">Filtruoti</button>
+        </form>
+        <div class="control-panel__buttons">
+          <div class="control-panel__button-group">
+            <button
+              class="control-panel__button"
+              id="button-min-price"
+              minmax="min"
+            >
+              Pigiausia knyga
+            </button>
+            <button
+              class="control-panel__button"
+              id="button-max-price"
+              minmax="max"
+            >
+              Brangiausia knyga
+            </button>
+          </div>
+          <div class="control-panel__button-group">
+            <button class="control-panel__button" id="button-inventory">
+              Apskaičiuoti inventoriaus vertę
+            </button>
+          </div>
+        </div>
+      </div>
+      <div id="summary-pannel" class="summary-panel hidden">
+        <div id="summary-title" class="summary-panel__title"></div>
+        <div id="summary-content" class="summary-panel__content"></div>
+      </div>
+      <ul id="book-list"></ul>
+    </main>
+    <footer>KITM</footer>
   </body>
 </html>

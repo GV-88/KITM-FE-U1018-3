@@ -1,0 +1,68 @@
+$sizeBreakpointSm: 576px;
+$sizeBreakpointMd: 768px;
+$sizeBreakpointLg: 992px;
+$sizeBreakpointXl: 1200px;
+
+:root {
+  --color-text-main: #111;
+  --color-text-important: #000;
+  --color-text-secondary: #444;
+  --color-text-label: #999;
+  --color-text-highlight: #b30;
+  --color-bg-main: #fff;
+  --color-bg-secondary: #eee;
+  --color-bg-tertiary: #ddd;
+  --color-bg-background: #ccc;
+  --color-bg-highlight: #fec;
+  --color-bg-main-alternate: #f9fcfc;
+  --size-factor-font-main: 1;
+  --size-factor-font-heading: 1;
+  --size-factor-font-label: 1;
+  --size-factor-spacing: 1;
+  @media (prefers-color-scheme: dark) {
+    --color-text-main: #eee;
+    --color-text-important: #fff;
+    --color-text-secondary: #ccc;
+    --color-text-label: #aaa;
+    --color-text-highlight: #fd8;
+    --color-bg-main: #444;
+    --color-bg-secondary: #333;
+    --color-bg-tertiary: #111;
+    --color-bg-background: #000;
+    --color-bg-highlight: #755;
+    --color-bg-main-alternate: #3f4141;
+  }
+  @media (min-width: $sizeBreakpointSm) {
+    --size-factor-font-label: 0.9375;
+    --size-factor-spacing: 1.0625;
+  }
+  @media (min-width: $sizeBreakpointMd) {
+    --size-factor-font-main: 0.9375;
+    --size-factor-font-heading: 1.0625;
+    --size-factor-spacing: 1.125;
+  }
+  @media (min-width: $sizeBreakpointLg) {
+    --size-factor-font-main: 1;
+    --size-factor-spacing: 1.5;
+  }
+  @media (min-width: $sizeBreakpointXl) {
+    --size-factor-font-main: 1.125;
+    --size-factor-font-heading: 1.5;
+    --size-factor-font-label: 1;
+    --size-factor-spacing: 2;
+  }
+}
+
+@function responsiveFontSizeMain($base) {
+  @return calc($base * var(--size-factor-font-main));
+}
+@function responsiveFontSizeheading($base) {
+  @return calc($base * var(--size-factor-font-heading));
+}
+@function responsiveFontSizeLabel($base) {
+  @return calc($base * var(--size-factor-font-label));
+}
+
+@function responsiveSpacing($base) {
+  @return calc($base * var(--size-factor-spacing));
+}
