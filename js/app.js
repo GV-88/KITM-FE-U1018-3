@@ -122,6 +122,10 @@ document.addEventListener('DOMContentLoaded', (e) => {
     updateSummary(); //clear summary on any filter update, this is only to prevent user confusion
   });
 
+  summaryElement
+    .querySelector('.summary-panel__button--close')
+    .addEventListener('click', (e) => summaryElement.classList.add('hidden'));
+
   document
     .querySelectorAll('#button-min-price, #button-max-price')
     .forEach((el) => el.addEventListener('click', topPriceEventHandler));
