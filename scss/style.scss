@@ -1,18 +1,4 @@
-@use 'variables';
-
-@function responsiveFontSizeMain($base) {
-  @return calc(#{$base} * var(--size-factor-font-main));
-}
-@function responsiveFontSizeheading($base) {
-  @return calc(#{$base} * var(--size-factor-font-heading));
-}
-@function responsiveFontSizeLabel($base) {
-  @return calc(#{$base} * var(--size-factor-font-label));
-}
-
-@function responsiveSpacing($base) {
-  @return calc(#{$base} * var(--size-factor-spacing));
-}
+@import 'variables';
 
 @mixin flexReverseWrap($maxItems) {
   display: flex;
@@ -40,7 +26,7 @@
 }
 
 .defaultContainer {
-  padding: #{responsiveSpacing(0.25rem)};
+  padding: responsiveSpacing(0.25rem);
   border-radius: responsiveSpacing(0.25rem);
 }
 
