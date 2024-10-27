@@ -52,17 +52,3 @@ $sizeBreakpointXl: 1200px;
     --size-factor-spacing: 2;
   }
 }
-
-@function responsiveFontSizeMain($base) {
-  @return calc($base * var(--size-factor-font-main));
-}
-@function responsiveFontSizeheading($base) {
-  @return calc($base * var(--size-factor-font-heading));
-}
-@function responsiveFontSizeLabel($base) {
-  @return calc($base * var(--size-factor-font-label));
-}
-
-@function responsiveSpacing($base) {
-  @return calc($base * var(--size-factor-spacing));
-}
